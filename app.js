@@ -67,17 +67,24 @@ var budgetController = (function(){
         },
 
         deleteItem: function(id, type) {
-            var ids, index;
+            var ids, index, newType;
 
-            ids = data.allItems[type].map(function(current){
+            newType= '';
+            if (type = 'expenses') {
+                newType = 'exp'
+            } else {
+                newType = 'inc'
+            };
+            
+
+            ids = data.allItems[newType].map(function(current){
                 return current.id;
             })
 
-            console.log(ids.indexOf(id));
             index = ids.indexOf(id);
 
             if (index !== -1) {
-                data.allItems[type].splice(index, 1);
+                data.allItems[newType].splice(index, 1);
             }
         },
 
@@ -94,7 +101,6 @@ var budgetController = (function(){
                 data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
             } else {
                 data.percentage = -1;
-                console.log('nie ma procentu');
             }
         },
 
@@ -141,7 +147,7 @@ var UIController = (function() {
         budgetIncome: '.budget__income--value',
         budgetExpense: '.budget__expenses--value',
         percentageExpense: '.budget__expenses--percentage',
-        container: '.container',
+        container: '.inputs_container',
         percentageItem: '.item__percentage',
         dateField: '.budget__title--month',
     };
@@ -190,10 +196,10 @@ var UIController = (function() {
             // create html string with placeholder 
             if (type === 'inc') {
                 element = DOMStrings.incomeList;
-                html = '<div class="item clearfix" id="inc-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+                html = '<div class="item" id="inc-%id%"><div class="item__description">%description%</div><div class="right"><div class="item__value">%value%</div><div class="item__delete"><button class="item__delete--btn">x</button></div></div></div>'
             } else if (type === 'exp') {
                 element = DOMStrings.expenseList;
-                html = '<div class="item clearfix" id="exp-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>'
+                html = '<div class="item" id="exp-%id%"><div class="item__description">%description%</div><div class="right"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn">x</button></div></div></div>'
             }
 
             // replace placeholder with the actual data
@@ -224,7 +230,7 @@ var UIController = (function() {
         },
 
         displayBudget: function(obj) {
-            var type;
+            var type, budgetNumber;
 
             obj.budget > 0 ? type = 'inc' : type = 'exp';
 
@@ -260,7 +266,6 @@ var UIController = (function() {
 
             months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
-            console.log(months[month] + ', ' + year);
             document.querySelector(DOMStrings.dateField).textContent = months[month] + ', ' + year;
         },
 
@@ -349,7 +354,7 @@ var controller = (function(budgetController, UIController){
         // find id of the clicked el
         var itemID, splitID, type, ID;
 
-        itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;
+        itemID = event.target.parentNode.parentNode.parentNode.id;
 
         // delete it from budgetController
         if(itemID) {
